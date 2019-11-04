@@ -379,6 +379,20 @@ bats_evaluate_preprocessed_source() {
   source "$BATS_TEST_SOURCE"
 }
 
+bats_create_mock() {
+    local -r mock_name="$1"
+    eval "declare -g ${mock_name}_TEST_RC=0"
+    eval "declare -g ${mock_name}_TEST_OUTPUT="
+    eval \
+    "$mock_name() {
+         local args_print=
+         [[ \"\$#\" -gt 0 ]] && args_print=\" \$@\"
+         echo \"$mock_name\$args_print\" >&2
+         [[ -n \"\$${mock_name}_TEST_OUTPUT\" ]] && echo \"\$${mock_name}_TEST_OUTPUT\"
+         return \$${mock_name}_TEST_RC
+    }"
+}
+
 exec 3<&1
 
 # Run the given test.
